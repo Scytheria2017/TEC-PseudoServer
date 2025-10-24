@@ -16,13 +16,13 @@ import struct
 # -------
 # ItemName = "Sword of Chaos"               
 # print(ItemName)                       ---> Sword of Chaos
-# ItemName = jabberwocky(ItemName)
+# ItemName = jw(ItemName)
 # print(ItemName)                       ---> !@#$%^&*@!#@+? (garbage)
-# ItemName = jabberwocky(ItemName)
+# ItemName = jw(ItemName)
 # print(ItemName)                       ---> Sword of Chaos
 
 
-def jabberwocky(data):
+def jw(data):
     key =  "TwasbrilligandtheslithytovesDidgyreandgimbleinthewabeAllmimsyweretheborogovesAndthemomerathsoutgrabe"
     key += "BewaretheJabberwockmysonThejawsthatbitetheclawsthatcatchBewaretheJubjubbirdandshunThefrumiousBandersnatch"
     key += "HetookhisvorpalswordinhandLongtimethemanxomefoehesoughtSorestedhebytheTumtumtreeAndstoodawhileinthought"
@@ -109,11 +109,11 @@ def jabberwocky(data):
             return not data if xor_bytes(bytes([data]))[0] else data
    
     elif isinstance(data, (list, tuple, set)):
-        scrambled = [jabberwocky(item) for item in data]
+        scrambled = [jw(item) for item in data]
         return type(data)(scrambled)
    
     elif isinstance(data, dict):
-        return {jabberwocky(k): jabberwocky(v) for k, v in data.items()}
+        return {jw(k): jw(v) for k, v in data.items()}
    
     elif data is None:
         return None
@@ -124,14 +124,4 @@ def jabberwocky(data):
             scrambled_bytes = xor_bytes(json_str.encode('utf-8'))
             return json.loads(scrambled_bytes.decode('latin-1'))
         except (TypeError, json.JSONDecodeError):
-            return data
-
-
-
-
-ItemName = "Sword of Chaos"               
-print(ItemName)                       
-ItemName = jabberwocky(ItemName)
-print(ItemName)                       
-ItemName = jabberwocky(ItemName)
-print(ItemName)                       
+            return data                  

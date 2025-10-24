@@ -1,12 +1,35 @@
-import Components.DefineJabberwocky
-import Components.DefineLogging
-import Components.DefineOpcodes
+from Components.Jabberwocky import jw
+from Components.Opcodes import *
 
 import asyncio
 import logging
 import os
 import struct
 import subprocess
+
+# -------------------
+# Debug (development)
+# -------------------
+
+DEBUG = True
+
+
+# -----------------
+# Configure logging
+# -----------------
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=' %(message)s',
+    handlers=[
+        logging.FileHandler('wow_server.log'),
+        logging.StreamHandler()
+    ]
+)
+
+def debug_logging(text):
+    if DEBUG:
+        logging.info(f" DEBUG: {text}")
 
 
 # ----------------
@@ -60,16 +83,16 @@ async def handle_client(reader, writer):
 
             opcode = auth_data[0]
    
-            if opcode == Opcode.AUTH_LOGON_CHALLENGE:
+            if opcode == AUTH_LOGON_CHALLENGE:
                 logging.info(f" Received login challenge")
-                response = struct.pack('<H', Opcode.AUTH_LOGON_PROOF) + b'\x00\x0000000000000000000000000000000000000000\x00000000\x00000000\x0000'
+                response = struct.pack('<H', AUTH_LOGON_PROOF) + b'\x00\x0000000000000000000000000000000000000000\x00000000\x00000000\x0000'
                 logging.info(f" Sending login response")
                 writer.write(response)
                 await writer.drain()
 
-            if opcode == Opcode.AUTH_LOGON_PROOF:
+            if opcode == AUTH_LOGON_PROOF:
                 logging.info(f" Received login proof")
-                redirect = struct.pack('<H', Opcode.AUTH_LOGON_SUCCESS) + b'\x01\x02\x03...'
+                redirect = struct.pack('<H', AUTH_LOGON_SUCCESS) + b'\x01\x02\x03...'
                 writer.write(redirect)
                 await writer.drain()
                 authenticated = True
@@ -94,12 +117,12 @@ async def handle_client(reader, writer):
 
             # Handle common world packets
             # ---------------------------
-            if opcode == Opcode.CMSG_PLAYER_LOGIN:
+            if opcode == CMSG_PLAYER_LOGIN:
                 logging.info(" Player login request")
 
                 # Respond with empty character list
                 # ---------------------------------
-                response = struct.pack('<HH', Opcode.SMSG_CHAR_ENUM, 0) + b'\x00'
+                response = struct.pack('<HH', SMSG_CHAR_ENUM, 0) + b'\x00'
                 writer.write(response)
                 await writer.drain()
 
