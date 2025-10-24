@@ -62,3 +62,258 @@
   DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
   Received login challenge
   Sending login response
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 12916)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 64832)
+ 
+  DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
+  Received login challenge for 
+  Sending login response
+  Client connected: ('127.0.0.1', 64833)
+ 
+  DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
+  Received login challenge for 
+  Sending login response
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 11100)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 64922)
+ 
+  DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
+  Received login challenge for b'\x06'
+  Sending login response
+  Client connected: ('127.0.0.1', 64923)
+ 
+  DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
+  Received login challenge for b'\x06'
+  Sending login response
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 10316)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 65250)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=420 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 127, in handle_client
+    username = "ACCOUNT" + auth_data[len(auth_data)]
+                           ~~~~~~~~~^^^^^^^^^^^^^^^^
+IndexError: index out of range
+  Client connected: ('127.0.0.1', 65251)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=352 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 127, in handle_client
+    username = "ACCOUNT" + auth_data[len(auth_data)]
+                           ~~~~~~~~~^^^^^^^^^^^^^^^^
+IndexError: index out of range
+  Client connected: ('127.0.0.1', 65253)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=400 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 127, in handle_client
+    username = "ACCOUNT" + auth_data[len(auth_data)]
+                           ~~~~~~~~~^^^^^^^^^^^^^^^^
+IndexError: index out of range
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 4456)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 65353)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=172 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 127, in handle_client
+    username = "ACCOUNT" + auth_data[len(auth_data)-1]
+               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "int") to str
+  Client connected: ('127.0.0.1', 65355)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=412 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 127, in handle_client
+    username = "ACCOUNT" + auth_data[len(auth_data)-1]
+               ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "int") to str
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 11172)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 65413)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT49
+  Sending login response
+  Client connected: ('127.0.0.1', 65414)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT49
+  Sending login response
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 10860)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 1041)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT1
+  Sending login response
+  Client connected: ('127.0.0.1', 1044)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT1
+  Sending login response
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 6752)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 1704)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT1
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=408 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 142, in handle_client
+    key = make_key(verify(account))
+                   ~~~~~~^^^^^^^^^
+  File "d:\Documents\GitHub\TEC-PseudoServer\Components\Verifier.py", line 13, in verify
+    salt = account.upper()["salt"]
+           ~~~~~~~~~~~~~~~^^^^^^^^
+TypeError: string indices must be integers, not 'str'
+  Client connected: ('127.0.0.1', 1705)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT1
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=72 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 142, in handle_client
+    key = make_key(verify(account))
+                   ~~~~~~^^^^^^^^^
+  File "d:\Documents\GitHub\TEC-PseudoServer\Components\Verifier.py", line 13, in verify
+    salt = account.upper()["salt"]
+           ~~~~~~~~~~~~~~~^^^^^^^^
+TypeError: string indices must be integers, not 'str'
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 3628)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 1800)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT1
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=380 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 142, in handle_client
+    key = make_key(verify(account))
+                   ~~~~~~^^^^^^^^^
+  File "d:\Documents\GitHub\TEC-PseudoServer\Components\Verifier.py", line 13, in verify
+    salt = account.upper()["salt"]
+           ~~~~~~~~~~~~~~~^^^^^^^^
+TypeError: string indices must be integers, not 'str'
+  Client connected: ('127.0.0.1', 1801)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT1
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=416 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 142, in handle_client
+    key = make_key(verify(account))
+                   ~~~~~~^^^^^^^^^
+  File "d:\Documents\GitHub\TEC-PseudoServer\Components\Verifier.py", line 13, in verify
+    salt = account.upper()["salt"]
+           ~~~~~~~~~~~~~~~^^^^^^^^
+TypeError: string indices must be integers, not 'str'
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 6356)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 1858)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT1
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=176 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 142, in handle_client
+    key = make_key(verify(account))
+                   ~~~~~~^^^^^^^^^
+  File "d:\Documents\GitHub\TEC-PseudoServer\Components\Verifier.py", line 13, in verify
+    salt = os.random(32)
+           ^^^^^^^^^
+AttributeError: module 'os' has no attribute 'random'. Did you mean: 'urandom'?
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 1260)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 1925)
+ 
+  DEBUG: b'\x00\x08&\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x08ACCOUNT1'
+  Received login challenge for ACCOUNT1
+  Sending login response

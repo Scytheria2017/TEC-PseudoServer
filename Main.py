@@ -1,4 +1,5 @@
 from Components.Jabberwocky import jw
+from Components.Verifier import verify, make_key
 
 import asyncio
 import logging
@@ -118,8 +119,38 @@ async def handle_client(reader, writer):
         opcode = auth_data[0]
    
         if opcode == AUTH_LOGON_CHALLENGE and not r_logon_challenge:
-            logging.info(f" Received login challenge")
-            response = struct.pack('<H', AUTH_LOGON_PROOF) + b'\x00\x0000000000000000000000000000000000000000\x00000000\x00000000\x0000'
+            
+            # Fudge - Accounts are all "ACCOUNT#" where # is 1 to 9
+            # -----------------------------------------------------
+            account = "ACCOUNT" + str(auth_data[len(auth_data)-1]-48)
+            logging.info(f" Received login challenge for {account}")
+
+            if account not in ("ACCOUNT1", 
+                                "ACCOUNT2", 
+                                "ACCOUNT3", 
+                                "ACCOUNT4", 
+                                "ACCOUNT5",
+                                "ACCOUNT6",
+                                "ACCOUNT7",
+                                "ACCOUNT8",
+                                "ACCOUNT9"):
+                logging.info(f" Invalid account name")
+                writer.write(b'\x00\x00')  # Failed
+                await writer.drain()
+                break
+
+            key = make_key(verify(account))
+
+            response = struct.pack(
+                '<HBB32s32s16s',
+                AUTH_LOGON_PROOF,
+                0,
+                32,
+                os.urandom(32),
+                key.to_bytes(32, 'big'),
+                os.urandom(16)
+            )
+
             logging.info(f" Sending login response")
             writer.write(response)
             await writer.drain()
