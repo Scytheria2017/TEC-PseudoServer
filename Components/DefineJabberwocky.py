@@ -3,13 +3,23 @@ import json
 import struct
 
 
-# ================================
-# jab - data encryption/decryption
-# ================================
+# ========================================
+# jabberwocky - data encryption/decryption
+# ========================================
 
 # Receives a variable, data, of any type
 # Encrypts/decrypts data (using XOR method)
-# 
+# key is text of "Jabberwocky" fronted by the
+# variable's actual name
+
+# Example
+# -------
+# ItemName = "Sword of Chaos"               
+# print(ItemName)                       ---> Sword of Chaos
+# ItemName = jabberwocky(ItemName)
+# print(ItemName)                       ---> !@#$%^&*@!#@+? (garbage)
+# ItemName = jabberwocky(ItemName)
+# print(ItemName)                       ---> Sword of Chaos
 
 
 def jabberwocky(data):
@@ -24,7 +34,8 @@ def jabberwocky(data):
     try:
         for name, value in frame.f_back.f_locals.items():
             if value is data:
-                key = name + str(len(name)) + key
+                key = name + key
+                print(key)
                 break
     finally:
         del frame
