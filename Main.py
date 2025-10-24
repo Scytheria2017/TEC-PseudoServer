@@ -10,7 +10,8 @@ import subprocess
 # Debug (development)
 # -------------------
 
-DEBUG = True
+DEBUG                   = True
+TEC_PATH                = 'd://Desktop/The Eternal Crusade/TEC.exe'
 
 
 # -----------------
@@ -100,32 +101,38 @@ async def handle_client(reader, writer):
     logging.info(f" Client connected: {client_addr}")
     logging.info(f"")
 
+    # ----------
     # AUTH Phase
     # ----------
-    auth_data = await reader.read(1024)
-    if not auth_data:
-        return
-    debug_logging(auth_data)
-    opcode = auth_data[0]
+
+    authenticated = False
+    r_logon_challenge = False
+    r_logon_proof = False
+
+    while not authenticated:
+
+        auth_data = await reader.read(1024)
+        if not auth_data:
+            return
+        debug_logging(auth_data)
+        opcode = auth_data[0]
    
-    if opcode == AUTH_LOGON_CHALLENGE:
-        logging.info(f" Received login challenge")
-        response = struct.pack('<H', AUTH_LOGON_PROOF) + b'\x00\x0000000000000000000000000000000000000000\x00000000\x00000000\x0000'
-        logging.info(f" Sending login response")
-        writer.write(response)
-        await writer.drain()
+        if opcode == AUTH_LOGON_CHALLENGE and not r_logon_challenge:
+            logging.info(f" Received login challenge")
+            response = struct.pack('<H', AUTH_LOGON_PROOF) + b'\x00\x0000000000000000000000000000000000000000\x00000000\x00000000\x0000'
+            logging.info(f" Sending login response")
+            writer.write(response)
+            await writer.drain()
+            r_logon_challenge = True
 
-    auth_data = await reader.read(1024)
-    if not auth_data:
-        return
-    debug_logging(auth_data)
-    opcode = auth_data[0]
+        if opcode == AUTH_LOGON_PROOF and not r_logon_proof:
+            logging.info(f" Received login proof")
+            redirect = struct.pack('<H', AUTH_LOGON_SUCCESS) + b'\x01\x02\x03...'
+            writer.write(redirect)
+            await writer.drain()
+            r_logon_proof = True
 
-    if opcode == AUTH_LOGON_PROOF:
-        logging.info(f" Received login proof")
-        redirect = struct.pack('<H', AUTH_LOGON_SUCCESS) + b'\x01\x02\x03...'
-        writer.write(redirect)
-        await writer.drain()
+        authenticated = r_logon_challenge and r_logon_proof
 
 
     # WORLD Phase
@@ -178,12 +185,11 @@ def cleanup():
     global wow_process
     if wow_process and wow_process.poll() is None:
         wow_process.terminate()
-        logging.info(" Terminated WoW client process")
+        logging.info(" Terminated TEC client process")
 
 async def main():
     try:
-        wow_path = 'd://Desktop/The Eternal Crusade/TEC.exe'
-        await launch_wow_client(wow_path)
+        await launch_wow_client(TEC_PATH)
         await run_server()
        
     except Exception as e:
