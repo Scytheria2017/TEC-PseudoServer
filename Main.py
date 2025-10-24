@@ -1,4 +1,5 @@
 import Components.DefineJabberwocky
+import Components.DefineLogging
 import Components.DefineOpcodes
 
 import asyncio
@@ -6,32 +7,6 @@ import logging
 import os
 import struct
 import subprocess
-
-
-
-# -----------------
-# Configure logging
-# -----------------
-
-logging.basicConfig(
-    level=logging.INFO,
-    format=' %(message)s',
-    handlers=[
-        logging.FileHandler('wow_server.log'),
-        logging.StreamHandler()
-    ]
-)
-
-
-# -------------
-# Debug Logging
-# -------------
-
-debug = True
-
-def debug_logging(text):
-    if debug:
-        logging.info(f" DEBUG: {text}")
 
 
 # ----------------

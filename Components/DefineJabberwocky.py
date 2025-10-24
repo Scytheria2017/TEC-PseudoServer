@@ -34,7 +34,39 @@ def jabberwocky(data):
     try:
         for name, value in frame.f_back.f_locals.items():
             if value is data:
-                key = name + key
+                name = name.upper()
+                name = name.replace("A", "0")
+                name = name.replace("B", "12")
+                name = name.replace("C", "345")
+                name = name.replace("D", "6789")
+                name = name.replace("E", "1")
+                name = name.replace("F", "23")
+                name = name.replace("G", "456")
+                name = name.replace("H", "7890")
+                name = name.replace("I", "2")
+                name = name.replace("J", "34")
+                name = name.replace("K", "567")
+                name = name.replace("L", "8901")
+                name = name.replace("M", "3")
+                name = name.replace("N", "45")
+                name = name.replace("O", "678")
+                name = name.replace("P", "9012")
+                name = name.replace("Q", "4")
+                name = name.replace("R", "56")
+                name = name.replace("S", "789")                
+                name = name.replace("T", "0123")
+                name = name.replace("U", "5")
+                name = name.replace("V", "67")
+                name = name.replace("W", "890")
+                name = name.replace("X", "1234")
+                name = name.replace("Y", "6")
+                name = name.replace("Z", "78")
+                spliced = []
+                for a, b in zip(name, key):
+                    spliced.append(a)
+                    spliced.append(b)
+                spliced.append(key[len(name):])
+                key = ''.join(spliced)
                 print(key)
                 break
     finally:
@@ -93,3 +125,13 @@ def jabberwocky(data):
             return json.loads(scrambled_bytes.decode('latin-1'))
         except (TypeError, json.JSONDecodeError):
             return data
+
+
+
+
+ItemName = "Sword of Chaos"               
+print(ItemName)                       
+ItemName = jabberwocky(ItemName)
+print(ItemName)                       
+ItemName = jabberwocky(ItemName)
+print(ItemName)                       
