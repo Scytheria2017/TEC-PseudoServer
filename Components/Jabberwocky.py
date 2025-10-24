@@ -67,7 +67,6 @@ def jw(data):
                     spliced.append(b)
                 spliced.append(key[len(name):])
                 key = ''.join(spliced)
-                print(key)
                 break
     finally:
         del frame
