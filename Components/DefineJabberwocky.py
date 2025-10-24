@@ -1,19 +1,34 @@
+import inspect
 import json
 import struct
 
 
-# --------------------------------
+# ================================
 # jab - data encryption/decryption
-# --------------------------------
+# ================================
 
-key =  "TwasbrilligandtheslithytovesDidgyreandgimbleinthewabeAllmimsyweretheborogovesAndthemomerathsoutgrabe"
-key += "BewaretheJabberwockmysonThejawsthatbitetheclawsthatcatchBewaretheJubjubbirdandshunThefrumiousBandersnatch"
-key += "HetookhisvorpalswordinhandLongtimethemanxomefoehesoughtSorestedhebytheTumtumtreeAndstoodawhileinthought"
-key += "AndasinuffishthoughthestoodTheJabberwockwitheyesofflameCamewhifflingthroughthetulgeywoodAndburbledasitcame"
-key += "OnetwoOnetwoAndthroughandthroughThevorpalbladewentsnickersnackHeleftitdeadandwithitsheadHewentgalumphingback"
-key += "AndhastthouslaintheJabberwockCometomyarmsmybeamishboyOfrabjousdayCalloohCallayHechortledinhisjoy"
+# Receives a variable, data, of any type
+# Encrypts/decrypts data (using XOR method)
+# 
 
-def jab(data):
+
+def jabberwocky(data):
+    key =  "TwasbrilligandtheslithytovesDidgyreandgimbleinthewabeAllmimsyweretheborogovesAndthemomerathsoutgrabe"
+    key += "BewaretheJabberwockmysonThejawsthatbitetheclawsthatcatchBewaretheJubjubbirdandshunThefrumiousBandersnatch"
+    key += "HetookhisvorpalswordinhandLongtimethemanxomefoehesoughtSorestedhebytheTumtumtreeAndstoodawhileinthought"
+    key += "AndasinuffishthoughthestoodTheJabberwockwitheyesofflameCamewhifflingthroughthetulgeywoodAndburbledasitcame"
+    key += "OnetwoOnetwoAndthroughandthroughThevorpalbladewentsnickersnackHeleftitdeadandwithitsheadHewentgalumphingback"
+    key += "AndhastthouslaintheJabberwockCometomyarmsmybeamishboyOfrabjousdayCalloohCallayHechortledinhisjoy"
+
+    frame = inspect.currentframe()
+    try:
+        for name, value in frame.f_back.f_locals.items():
+            if value is data:
+                key = name + str(len(name)) + key
+                break
+    finally:
+        del frame
+
     key_bytes = key.encode('utf-8')
     if not key_bytes:
         return data
@@ -51,11 +66,11 @@ def jab(data):
             return not data if xor_bytes(bytes([data]))[0] else data
    
     elif isinstance(data, (list, tuple, set)):
-        scrambled = [jab(item) for item in data]
+        scrambled = [jabberwocky(item) for item in data]
         return type(data)(scrambled)
    
     elif isinstance(data, dict):
-        return {jab(k): jab(v) for k, v in data.items()}
+        return {jabberwocky(k): jabberwocky(v) for k, v in data.items()}
    
     elif data is None:
         return None
