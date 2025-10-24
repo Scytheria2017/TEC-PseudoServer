@@ -1,5 +1,4 @@
 from Components.Jabberwocky import jw
-from Components.Opcodes import *
 
 import asyncio
 import logging
@@ -30,6 +29,37 @@ logging.basicConfig(
 def debug_logging(text):
     if DEBUG:
         logging.info(f" DEBUG: {text}")
+
+
+# -------------------
+# Auth Packet Opcodes
+# -------------------
+
+AUTH_LOGON_CHALLENGE =          0x00
+AUTH_LOGON_PROOF =              0x01
+AUTH_LOGON_SUCCESS =            0x03
+
+AUTH_RECONNECT_CHALLENGE =      0x02
+AUTH_RECONNECT_PROOF =          0x03
+
+REALM_LIST =                    0x10
+
+XFER_INITIATE =                 0x30
+XFER_DATA =                     0x31
+XFER_ACCEPT =                   0x32
+XFER_RESUME =                   0x33
+XFER_CANCEL =                   0x34
+
+
+# ---------------------
+# Client Packet Opcodes
+# ---------------------
+    
+
+# ---------------------
+# Server Packet Opcodes
+# ---------------------
+
 
 
 # ----------------
@@ -70,35 +100,33 @@ async def handle_client(reader, writer):
     logging.info(f" Client connected: {client_addr}")
     logging.info(f"")
 
-    authenticated = False
-
     # AUTH Phase
     # ----------
-    while not authenticated:
-        try:
-            auth_data = await reader.read(1024)
-            if not auth_data:
-                return
-            debug_logging(auth_data)
-
-            opcode = auth_data[0]
+    auth_data = await reader.read(1024)
+    if not auth_data:
+        return
+    debug_logging(auth_data)
+    opcode = auth_data[0]
    
-            if opcode == AUTH_LOGON_CHALLENGE:
-                logging.info(f" Received login challenge")
-                response = struct.pack('<H', AUTH_LOGON_PROOF) + b'\x00\x0000000000000000000000000000000000000000\x00000000\x00000000\x0000'
-                logging.info(f" Sending login response")
-                writer.write(response)
-                await writer.drain()
+    if opcode == AUTH_LOGON_CHALLENGE:
+        logging.info(f" Received login challenge")
+        response = struct.pack('<H', AUTH_LOGON_PROOF) + b'\x00\x0000000000000000000000000000000000000000\x00000000\x00000000\x0000'
+        logging.info(f" Sending login response")
+        writer.write(response)
+        await writer.drain()
 
-            if opcode == AUTH_LOGON_PROOF:
-                logging.info(f" Received login proof")
-                redirect = struct.pack('<H', AUTH_LOGON_SUCCESS) + b'\x01\x02\x03...'
-                writer.write(redirect)
-                await writer.drain()
-                authenticated = True
+    auth_data = await reader.read(1024)
+    if not auth_data:
+        return
+    debug_logging(auth_data)
+    opcode = auth_data[0]
 
-        except Exception as e:
-            logging.error(f" ERROR - {e}")
+    if opcode == AUTH_LOGON_PROOF:
+        logging.info(f" Received login proof")
+        redirect = struct.pack('<H', AUTH_LOGON_SUCCESS) + b'\x01\x02\x03...'
+        writer.write(redirect)
+        await writer.drain()
+
 
     # WORLD Phase
     # -----------

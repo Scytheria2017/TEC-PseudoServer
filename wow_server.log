@@ -11,3 +11,35 @@
  
   DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
   ERROR - name 'AUTH_LOGON_CHALLENGE' is not defined
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 15940)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 56786)
+ 
+  DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
+  ERROR - name 'AUTH_LOGON_CHALLENGE' is not defined
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 13964)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 56839)
+ 
+  DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
+  Received login challenge
+  Sending login response
+  Client connected: ('127.0.0.1', 56842)
+ 
+  DEBUG: b'\x00\x08$\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x06ANASTA'
+  Received login challenge
+  Sending login response
