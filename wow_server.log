@@ -330,3 +330,18 @@ AttributeError: module 'os' has no attribute 'random'. Did you mean: 'urandom'?
  
   Client connected: ('127.0.0.1', 6474)
  
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 10472)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 7244)
+ 
+  Client connected: ('127.0.0.1', 7246)
+ 
+  Client connected: ('127.0.0.1', 7248)
+ 
