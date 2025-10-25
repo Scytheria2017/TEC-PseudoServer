@@ -28,7 +28,7 @@ if DEBUG:
         level=logging.INFO,
         format=' %(message)s',
         handlers=[
-            logging.FileHandler('wow_server.log', mode='w'),
+            logging.FileHandler('Server.log', mode='w'),
             logging.StreamHandler()
         ]
     )
@@ -47,16 +47,6 @@ def debug_logging(text):
         logging.info(f" DEBUG: {text}")
 
 
-# -----------
-# Game Phases
-# -----------
-
-PHASE_LOGON =                   0
-PHASE_REALM =                   1
-PHASE_LOBBY =                   2
-PHASE_WORLD =                   3
-
-
 # -------------------
 # Auth Packet Opcodes
 # -------------------
@@ -66,9 +56,9 @@ LOGON_PROOF =                   0x01
 LOGON_SUCCESS =                 0x03
 
 
-# ----------------------------
-# Client/Server Packet Opcodes
-# ----------------------------
+# --------------------
+# World Packet Opcodes
+# --------------------
     
 C_REALM_LIST =                  0x01
 C_PLAYER_LOGIN =                0x003D
@@ -106,127 +96,119 @@ async def launch_client(wow_path):
     logging.info(f" Launched TEC client (PID: {wow_process.pid})")
 
 
-# -------------
-# Handle Client
-# -------------
+# -------------------
+# Handle login client
+# -------------------
 
-async def handle_client(reader, writer):
+async def handle_login_client(reader, writer):
     client_addr = writer.get_extra_info('peername')
-    logging.info(f" Client connected: {client_addr}")
+    logging.info(f" Login client connected: {client_addr}")
     logging.info(f"")
-
-    phase = PHASE_LOGON
 
     while True:
         try:
 
             data = await reader.read(1024)
             if not data:
-                return
+                break
             debug_logging(data)
 
-            # -----------
-            # Logon phase
-            # -----------
+            opcode = struct.unpack('<H', data[:2])[0]
+    
+            if opcode == LOGON_CHALLENGE:
+            
+                response = struct.pack('<HBB32s32s16s',
+                    LOGON_PROOF,
+                    0,
+                    32,
+                    ACCOUNT["salt"],
+                    b'\x11'*32,
+                    b'\x22'*16
+                )
 
-            if phase == PHASE_LOGON:
+                writer.write(response)
+                debug_logging(response)
+                await writer.drain()
 
-                opcode = struct.unpack('<H', data[:2])[0]
-        
-                if opcode == LOGON_CHALLENGE:
-                
-                    response = struct.pack('<HBB32s32s16s',
-                        LOGON_PROOF,
-                        0,
-                        32,
-                        ACCOUNT["salt"],
-                        b'\x11'*32,
-                        b'\x22'*16
-                    )
+                proof_data = await reader.read(75)
+                if not proof_data:
+                    break
+                debug_logging(proof_data)
 
-                    writer.write(response)
-                    debug_logging(response)
-                    await writer.drain()
+                success_packet = struct.pack('<HBBIBI',
+                    LOGON_SUCCESS,
+                    0x00,
+                    0x00,
+                    0x00000000,
+                    0x00,
+                    0x00000000
+                ) + b'\x00' + b'127.0.0.1:8085\x00'
 
-                    proof_data = await reader.read(75)
-                    if not proof_data:
-                        break
-                    debug_logging(proof_data)
+                writer.write(success_packet)
+                debug_logging(success_packet)
+                await writer.drain()
+                logging.info(f" Logon Successful")
 
-                    success_packet = struct.pack('<HBBIBI',
-                        LOGON_SUCCESS,
-                        0x00,
-                        0x00,
-                        0x00000000,
-                        0x00,
-                        0x00000000
-                    )
+            elif opcode == C_REALM_LIST:
 
-                    writer.write(success_packet)
-                    debug_logging(success_packet)
-                    await writer.drain()
-                    logging.info(f" Logon Successful")
-                    phase = PHASE_REALM
+                realm_packet = struct.pack(
+                    '<HBBHBBBBBB',
+                    S_REALM_LIST,
+                    1,              # Realm count
+                    0,              # Padding
+                    0,              # Realm type
+                    1,              # Realm flags (1 = online)
+                    0,              # Locked (0 = unlocked)
+                    0,              # Timezone
+                    0,              # Population
+                    0               # Unknown
+                ) + b'The Eternal Crusade\x00' + b'127.0.0.1:8085\x00'
 
-            # -----------
-            # Realm phase
-            # -----------
+                writer.write(realm_packet)
+                debug_logging(success_packet)
+                await writer.drain()
+                logging.info(f" Realm established")
 
-            elif phase == PHASE_REALM:
-               
-                opcode = struct.unpack('<H', data[:2])[0]
+        except ConnectionResetError:
+            break
 
-                if opcode == C_REALM_LIST:
-
-                    realm_packet = struct.pack(
-                        '<HBBHBBBBBB',
-                        S_REALM_LIST,    
-                        1,
-                        0,
-                        0,
-                        1,
-                        0,
-                        1,
-                        0,
-                        0,
-                        0
-                    ) + b'The Eternal Crusade\x00' + b'127.0.0.1:8085\x00'
-
-                    writer.write(realm_packet)
-                    debug_logging(success_packet)
-                    await writer.drain()
-                    logging.info(f" Realm established")
-                    phase = PHASE_LOBBY
-
-            # -----------
-            # Lobby phase
-            # -----------
-
-            elif phase == PHASE_LOBBY:
-
-                opcode = struct.unpack('<H', data[:2])[0]
-
-                if opcode == C_PLAYER_LOGIN:
-
-                    char_packet = struct.pack(
-                        '<HHB',
-                        S_CHAR_ENUM,
-                        1,
-                        0
-                    )
-                    writer.write(char_packet)
-                    debug_logging(char_packet)
-                    await writer.drain()
-                    logging.info(f" Characters loaded")
+        except Exception as e:
+            logging.error(f" ERROR - handling login client: {e}")
+            break
 
 
-            # -----------
-            # World phase
-            # -----------
+# -------------------
+# Handle world client
+# -------------------
 
-            if phase == PHASE_WORLD:
-                pass
+async def handle_world_client(reader, writer):
+    client_addr = writer.get_extra_info('peername')
+    logging.info(f" World client connected: {client_addr}")
+    logging.info(f"")
 
+    while True:
+        try:
+
+            data = await reader.read(1024)
+            if not data:
+                break
+            debug_logging(data)
+
+            opcode = struct.unpack('<H', data[:2])[0]
+
+            if opcode == C_PLAYER_LOGIN:
+
+                char_packet = struct.pack(
+                    '<HHB',
+                    S_CHAR_ENUM,
+                    1,       # Size byte
+                    0        # 0 characters
+                )
+
+                writer.write(char_packet)
+                debug_logging(char_packet)
+                await writer.drain()
+                logging.info(f" Characters loaded")
 
         except ConnectionResetError:
             break
@@ -240,14 +222,18 @@ async def handle_client(reader, writer):
   
 
 async def run_server():
-    server = await asyncio.start_server(
-        handle_client, '0.0.0.0', 3724)
+    login_server = await asyncio.start_server(
+        handle_login_client, '0.0.0.0', 3724)
+    world_server = await asyncio.start_server(
+        handle_world_client, '0.0.0.0', 8085)
 
-    addr = server.sockets[0].getsockname()
-    logging.info(f" Server running on {addr[0]}:{addr[1]}")
+    logging.info(f"Login server running on 0.0.0.0:3724")
+    logging.info(f"World server running on 0.0.0.0:8085")
    
-    async with server:
-        await server.serve_forever()
+    await asyncio.gather(
+        login_server.serve_forever(),
+        world_server.serve_forever()
+    )
 
 def cleanup():
     global wow_process
