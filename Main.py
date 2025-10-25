@@ -39,6 +39,15 @@ def debug_logging(text):
         logging.info(f" DEBUG: {text}")
 
 
+# -----------
+# Game Phases
+# -----------
+
+PHASE_LOGON =                   0
+PHASE_LOBBY =                   1
+PHASE_WORLD =                   2
+
+
 # -------------------
 # Auth Packet Opcodes
 # -------------------
@@ -90,7 +99,7 @@ logging.info(f"")
 # Launch Client
 # -------------
 
-async def launch_wow_client(wow_path):
+async def launch_client(wow_path):
     global wow_process
     if not os.path.exists(wow_path):
         raise FileNotFoundError(f" ERROR - TEC client not found at {wow_path}")
@@ -107,29 +116,51 @@ async def handle_client(reader, writer):
     logging.info(f" Client connected: {client_addr}")
     logging.info(f"")
 
-    # ----------
-    # AUTH Phase
-    # ----------
-  
-    data = await reader.read(1024)
-    debug_logging(" LOGON CHALLENGE" + data)
-    opcode = struct.unpack('<H', data[:2])[0]
-    
-    if opcode != LOGON_CHALLENGE:
-        writer.close()
-        return
+    phase = PHASE_LOGON
 
-    response = struct.pack('<HBB32s32s16s',
-        LOGON_PROOF,
-        0,
-        32,
-        ACCOUNT["salt"],
-        b'\x11\x22\x33\x44' + b'\x00'*28,
-        b'\x55\x66\x77\x88' + b'\x00'*12
-    )
-    writer.write(response)
-    debug_logging(response)
-    await writer.drain()
+    while True:
+        try:
+
+            data = await reader.read(1024)
+            debug_logging(data)
+
+            if phase == PHASE_LOGON:
+
+                opcode = struct.unpack('<H', data[:2])[0]
+        
+                if opcode != LOGON_CHALLENGE:
+                    writer.close()
+                    return
+
+                response = struct.pack('<HBB32s32s16s',
+                    LOGON_PROOF,
+                    0,
+                    32,
+                    ACCOUNT["salt"],
+                    b'\x11\x22\x33\x44' + b'\x00'*28,
+                    b'\x55\x66\x77\x88' + b'\x00'*12
+                )
+                writer.write(response)
+                debug_logging(response)
+                await writer.drain()
+
+        except ConnectionResetError:
+            break
+
+        except Exception as e:
+            logging.error(f" ERROR - handling client: {e}")
+            break
+
+    logging.info(f" Client disconnected: {client_addr}")
+    writer.close()
+
+
+
+
+
+
+
+
 
     success_packet = struct.pack('<HBBIBI',
         LOGON_SUCCESS,
@@ -170,15 +201,7 @@ async def handle_client(reader, writer):
                 writer.write(response)
                 await writer.drain()
 
-        except ConnectionResetError:
-            break
 
-        except Exception as e:
-            logging.error(f" ERROR - handling client: {e}")
-            break
-
-    logging.info(f" Client disconnected: {client_addr}")
-    writer.close()
 
 async def run_server():
     server = await asyncio.start_server(
