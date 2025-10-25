@@ -1,13 +1,3 @@
- 
-  ======================================
-  --------------------------------------
-  The Eternal Crusade Pseudo-Server v1.0
-  --------------------------------------
-  ======================================
- 
-  Launched TEC client (PID: 1384)
- Login server running on 0.0.0.0:3724
- World server running on 0.0.0.0:8085
-  Login client connected: ('127.0.0.1', 51780)
- 
-  DEBUG: b'\x00\x08%\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x07ETERNAL'
+2025-10-26 05:07:52,099 - Servers running:
+2025-10-26 05:07:52,100 - - Auth: 0.0.0.0:3724
+2025-10-26 05:07:52,100 - - World: 0.0.0.0:8085
