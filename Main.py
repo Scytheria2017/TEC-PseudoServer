@@ -1,5 +1,3 @@
-from Components.Jabberwocky import jw
-
 import asyncio
 import logging
 import os
@@ -25,14 +23,24 @@ ACCOUNT = {"username": "Eternal", "password": "Crusade", "salt": b'\x01\x02\x03\
 # Configure logging
 # -----------------
 
-logging.basicConfig(
-    level=logging.INFO,
-    format=' %(message)s',
-    handlers=[
-        logging.FileHandler('wow_server.log'),
-        logging.StreamHandler()
-    ]
-)
+if DEBUG:
+    logging.basicConfig(
+        level=logging.INFO,
+        format=' %(message)s',
+        handlers=[
+            logging.FileHandler('wow_server.log', mode='w'),
+            logging.StreamHandler()
+        ]
+    )
+else:
+    logging.basicConfig(
+        level=logging.INFO,
+        format=' %(message)s',
+        handlers=[
+            logging.StreamHandler()
+        ]
+    ) 
+
 
 def debug_logging(text):
     if DEBUG:
@@ -122,7 +130,13 @@ async def handle_client(reader, writer):
         try:
 
             data = await reader.read(1024)
+            if not data:
+                return
             debug_logging(data)
+
+            # -----------
+            # Logon phase
+            # -----------
 
             if phase == PHASE_LOGON:
 
@@ -137,12 +151,49 @@ async def handle_client(reader, writer):
                     0,
                     32,
                     ACCOUNT["salt"],
-                    b'\x11\x22\x33\x44' + b'\x00'*28,
-                    b'\x55\x66\x77\x88' + b'\x00'*12
+                    b'\x11'*32,
+                    b'\x22'*16
                 )
                 writer.write(response)
                 debug_logging(response)
                 await writer.drain()
+
+                proof_data = await reader.read(75)
+                if not proof_data:
+                    return
+                debug_logging(proof_data)
+
+                success_packet = struct.pack('<HBBIBI',
+                    LOGON_SUCCESS,
+                    0x00,
+                    0x00,
+                    0x00000000,
+                    0x00,
+                    0x00000000
+                )
+
+                writer.write(success_packet)
+                debug_logging(success_packet)
+                await writer.drain()
+
+                logging.info(f" Logon Successful")
+                phase = PHASE_LOBBY
+
+            # -----------
+            # Lobby phase
+            # -----------
+
+            if phase == PHASE_LOBBY:
+                pass
+
+
+            # -----------
+            # World phase
+            # -----------
+
+            if phase == PHASE_WORLD:
+                pass
+
 
         except ConnectionResetError:
             break
@@ -153,55 +204,7 @@ async def handle_client(reader, writer):
 
     logging.info(f" Client disconnected: {client_addr}")
     writer.close()
-
-
-
-
-
-
-
-
-
-    success_packet = struct.pack('<HBBIBI',
-        LOGON_SUCCESS,
-        0,
-        0,
-        0,
-        0,
-        0
-    )
-    writer.write(success_packet)
-    debug_logging(success_packet)
-    await writer.drain()
-    print(f"[Auth] User '{ACCOUNT['username']}' authenticated")
-        
-    # WORLD Phase
-    # -----------
-    logging.info(" Client authenticated, switching to world protocol")
-    while True:
-        try:
-            data = await reader.read(1024)
-            if not data:
-                break
-
-            # Parse packet header
-            # -------------------
-            opcode, size = struct.unpack('<HH', data[:4])
-            payload = data[4:4+size]
-            logging.info(f" Received opcode: {hex(opcode)}, size: {size}, payload: {payload.hex()}")
-
-            # Handle common world packets
-            # ---------------------------
-            if opcode == CMSG_PLAYER_LOGIN:
-                logging.info(" Player login request")
-
-                # Respond with empty character list
-                # ---------------------------------
-                response = struct.pack('<HH', SMSG_CHAR_ENUM, 0) + b'\x00'
-                writer.write(response)
-                await writer.drain()
-
-
+  
 
 async def run_server():
     server = await asyncio.start_server(
@@ -221,7 +224,7 @@ def cleanup():
 
 async def main():
     try:
-        await launch_wow_client(TEC_PATH)
+        await launch_client(TEC_PATH)
         await run_server()
        
     except Exception as e:
