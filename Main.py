@@ -52,8 +52,9 @@ def debug_logging(text):
 # -----------
 
 PHASE_LOGON =                   0
-PHASE_LOBBY =                   1
-PHASE_WORLD =                   2
+PHASE_REALM =                   1
+PHASE_LOBBY =                   2
+PHASE_WORLD =                   3
 
 
 # -------------------
@@ -61,29 +62,19 @@ PHASE_WORLD =                   2
 # -------------------
 
 LOGON_CHALLENGE =               0x00
-RECONNECT_CHALLENGE =           0x02 #???
 LOGON_PROOF =                   0x01
 LOGON_SUCCESS =                 0x03
-RECONNECT_PROOF =               0x03 #???
-
-REALM_LIST =                    0x10
-
-XFER_INITIATE =                 0x30
-XFER_DATA =                     0x31
-XFER_ACCEPT =                   0x32
-XFER_RESUME =                   0x33
-XFER_CANCEL =                   0x34
 
 
-# ---------------------
-# Client Packet Opcodes
-# ---------------------
+# ----------------------------
+# Client/Server Packet Opcodes
+# ----------------------------
     
+C_REALM_LIST =                  0x01
+C_PLAYER_LOGIN =                0x003D
 
-# ---------------------
-# Server Packet Opcodes
-# ---------------------
-
+S_REALM_LIST =                  0x10
+S_CHAR_ENUM =                   0x003B
 
 
 # ----------------
@@ -142,49 +133,91 @@ async def handle_client(reader, writer):
 
                 opcode = struct.unpack('<H', data[:2])[0]
         
-                if opcode != LOGON_CHALLENGE:
-                    writer.close()
-                    return
+                if opcode == LOGON_CHALLENGE:
+                
+                    response = struct.pack('<HBB32s32s16s',
+                        LOGON_PROOF,
+                        0,
+                        32,
+                        ACCOUNT["salt"],
+                        b'\x11'*32,
+                        b'\x22'*16
+                    )
 
-                response = struct.pack('<HBB32s32s16s',
-                    LOGON_PROOF,
-                    0,
-                    32,
-                    ACCOUNT["salt"],
-                    b'\x11'*32,
-                    b'\x22'*16
-                )
-                writer.write(response)
-                debug_logging(response)
-                await writer.drain()
+                    writer.write(response)
+                    debug_logging(response)
+                    await writer.drain()
 
-                proof_data = await reader.read(75)
-                if not proof_data:
-                    return
-                debug_logging(proof_data)
+                    proof_data = await reader.read(75)
+                    if not proof_data:
+                        break
+                    debug_logging(proof_data)
 
-                success_packet = struct.pack('<HBBIBI',
-                    LOGON_SUCCESS,
-                    0x00,
-                    0x00,
-                    0x00000000,
-                    0x00,
-                    0x00000000
-                )
+                    success_packet = struct.pack('<HBBIBI',
+                        LOGON_SUCCESS,
+                        0x00,
+                        0x00,
+                        0x00000000,
+                        0x00,
+                        0x00000000
+                    )
 
-                writer.write(success_packet)
-                debug_logging(success_packet)
-                await writer.drain()
+                    writer.write(success_packet)
+                    debug_logging(success_packet)
+                    await writer.drain()
+                    logging.info(f" Logon Successful")
+                    phase = PHASE_REALM
 
-                logging.info(f" Logon Successful")
-                phase = PHASE_LOBBY
+            # -----------
+            # Realm phase
+            # -----------
+
+            elif phase == PHASE_REALM:
+               
+                opcode = struct.unpack('<H', data[:2])[0]
+
+                if opcode == C_REALM_LIST:
+
+                    realm_packet = struct.pack(
+                        '<HBBHBBBBBB',
+                        S_REALM_LIST,    
+                        1,
+                        0,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0
+                    ) + b'The Eternal Crusade\x00' + b'127.0.0.1:8085\x00'
+
+                    writer.write(realm_packet)
+                    debug_logging(success_packet)
+                    await writer.drain()
+                    logging.info(f" Realm established")
+                    phase = PHASE_LOBBY
 
             # -----------
             # Lobby phase
             # -----------
 
-            if phase == PHASE_LOBBY:
-                pass
+            elif phase == PHASE_LOBBY:
+
+                opcode = struct.unpack('<H', data[:2])[0]
+
+                if opcode == C_PLAYER_LOGIN:
+
+                    char_packet = struct.pack(
+                        '<HHB',
+                        S_CHAR_ENUM,
+                        1,
+                        0
+                    )
+                    writer.write(char_packet)
+                    debug_logging(char_packet)
+                    await writer.drain()
+                    logging.info(f" Characters loaded")
 
 
             # -----------
