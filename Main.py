@@ -44,11 +44,10 @@ def debug_logging(text):
 # -------------------
 
 LOGON_CHALLENGE =               0x00
+RECONNECT_CHALLENGE =           0x02 #???
 LOGON_PROOF =                   0x01
 LOGON_SUCCESS =                 0x03
-
-AUTH_RECONNECT_CHALLENGE =      0x02
-AUTH_RECONNECT_PROOF =          0x03
+RECONNECT_PROOF =               0x03 #???
 
 REALM_LIST =                    0x10
 
@@ -113,6 +112,7 @@ async def handle_client(reader, writer):
     # ----------
   
     data = await reader.read(1024)
+    debug_logging(" LOGON CHALLENGE" + data)
     opcode = struct.unpack('<H', data[:2])[0]
     
     if opcode != LOGON_CHALLENGE:
@@ -128,6 +128,7 @@ async def handle_client(reader, writer):
         b'\x55\x66\x77\x88' + b'\x00'*12
     )
     writer.write(response)
+    debug_logging(response)
     await writer.drain()
 
     success_packet = struct.pack('<HBBIBI',
@@ -139,6 +140,7 @@ async def handle_client(reader, writer):
         0
     )
     writer.write(success_packet)
+    debug_logging(success_packet)
     await writer.drain()
     print(f"[Auth] User '{ACCOUNT['username']}' authenticated")
         

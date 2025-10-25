@@ -345,3 +345,51 @@ AttributeError: module 'os' has no attribute 'random'. Did you mean: 'urandom'?
  
   Client connected: ('127.0.0.1', 7248)
  
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 1868)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 7689)
+ 
+  DEBUG: b'\x00\x08%\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x07ETERNAL'
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 13392)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 7750)
+ 
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=76 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 115, in handle_client
+    debug_logging(" LOGON CHALLENGE", data)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: debug_logging() takes 1 positional argument but 2 were given
+ 
+  ======================================
+  --------------------------------------
+  The Eternal Crusade Pseudo-Server v1.0
+  --------------------------------------
+  ======================================
+ 
+  Launched TEC client (PID: 12564)
+  Server running on 0.0.0.0:3724
+  Client connected: ('127.0.0.1', 7784)
+ 
+ Unhandled exception in client_connected_cb
+transport: <_ProactorSocketTransport fd=160 read=<_OverlappedFuture pending cb=[_ProactorReadPipeTransport._loop_reading()]>>
+Traceback (most recent call last):
+  File "d:\Documents\GitHub\TEC-PseudoServer\Main.py", line 115, in handle_client
+    debug_logging(" LOGON CHALLENGE" + data)
+                  ~~~~~~~~~~~~~~~~~~~^~~~~~
+TypeError: can only concatenate str (not "bytes") to str
