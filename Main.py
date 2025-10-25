@@ -1,5 +1,4 @@
 from Components.Jabberwocky import jw
-from Components.Verifier import verify, make_key
 
 import asyncio
 import logging
@@ -13,6 +12,13 @@ import subprocess
 
 DEBUG                   = True
 TEC_PATH                = 'd://Desktop/The Eternal Crusade/TEC.exe'
+
+
+# ------------------
+# Hard-coded account
+# ------------------
+
+ACCOUNT = {"username": "Eternal", "password": "Crusade", "salt": b'\x01\x02\x03\x04\x05' + b'\x00'*27}
 
 
 # -----------------
@@ -105,67 +111,40 @@ async def handle_client(reader, writer):
     # ----------
     # AUTH Phase
     # ----------
+  
+    data = await reader.read(1024)
+    opcode = struct.unpack('<H', data[:2])[0]
+    
+    if opcode != 0x00:
+        writer.close()
+        return
 
-    authenticated = False
-    r_logon_challenge = False
-    r_logon_proof = False
+    response = struct.pack('<HBB32s32s16s',
+        0x01,
+        0,
+        32,
+        ACCOUNT["salt"],
+        b'\x11\x22\x33\x44' + b'\x00'*28,
+        b'\x55\x66\x77\x88' + b'\x00'*12
+    )
+    writer.write(response)
+    await writer.drain()
 
-    while not authenticated:
+    proof_data = await reader.read(75)
+    client_proof = proof_data[1:33]
 
-        auth_data = await reader.read(1024)
-        if not auth_data:
-            return
-        debug_logging(auth_data)
-        opcode = auth_data[0]
-   
-        if opcode == AUTH_LOGON_CHALLENGE and not r_logon_challenge:
-            
-            # Fudge - Accounts are all "ACCOUNT#" where # is 1 to 9
-            # -----------------------------------------------------
-            account = "ACCOUNT" + str(auth_data[len(auth_data)-1]-48)
-            logging.info(f" Received login challenge for {account}")
-
-            if account not in ("ACCOUNT1", 
-                                "ACCOUNT2", 
-                                "ACCOUNT3", 
-                                "ACCOUNT4", 
-                                "ACCOUNT5",
-                                "ACCOUNT6",
-                                "ACCOUNT7",
-                                "ACCOUNT8",
-                                "ACCOUNT9"):
-                logging.info(f" Invalid account name")
-                writer.write(b'\x00\x00')  # Failed
-                await writer.drain()
-                break
-
-            key = make_key(verify(account))
-
-            response = struct.pack(
-                '<HBB32s32s16s',
-                AUTH_LOGON_PROOF,
-                0,
-                32,
-                os.urandom(32),
-                key.to_bytes(32, 'big'),
-                os.urandom(16)
-            )
-
-            logging.info(f" Sending login response")
-            writer.write(response)
-            await writer.drain()
-            r_logon_challenge = True
-
-        if opcode == AUTH_LOGON_PROOF and not r_logon_proof:
-            logging.info(f" Received login proof")
-            redirect = struct.pack('<H', AUTH_LOGON_SUCCESS) + b'\x01\x02\x03...'
-            writer.write(redirect)
-            await writer.drain()
-            r_logon_proof = True
-
-        authenticated = r_logon_challenge and r_logon_proof
-
-
+    success_packet = struct.pack('<HBBIBI',
+        0x03,
+        0,
+        0,
+        0,
+        0,
+        0
+    )
+    writer.write(success_packet)
+    await writer.drain()
+    print(f"[Auth] User '{ACCOUNT['username']}' authenticated")
+        
     # WORLD Phase
     # -----------
     logging.info(" Client authenticated, switching to world protocol")
