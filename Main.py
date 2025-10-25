@@ -43,9 +43,9 @@ def debug_logging(text):
 # Auth Packet Opcodes
 # -------------------
 
-AUTH_LOGON_CHALLENGE =          0x00
-AUTH_LOGON_PROOF =              0x01
-AUTH_LOGON_SUCCESS =            0x03
+LOGON_CHALLENGE =               0x00
+LOGON_PROOF =                   0x01
+LOGON_SUCCESS =                 0x03
 
 AUTH_RECONNECT_CHALLENGE =      0x02
 AUTH_RECONNECT_PROOF =          0x03
@@ -115,12 +115,12 @@ async def handle_client(reader, writer):
     data = await reader.read(1024)
     opcode = struct.unpack('<H', data[:2])[0]
     
-    if opcode != 0x00:
+    if opcode != LOGON_CHALLENGE:
         writer.close()
         return
 
     response = struct.pack('<HBB32s32s16s',
-        0x01,
+        LOGON_PROOF,
         0,
         32,
         ACCOUNT["salt"],
@@ -130,11 +130,8 @@ async def handle_client(reader, writer):
     writer.write(response)
     await writer.drain()
 
-    proof_data = await reader.read(75)
-    client_proof = proof_data[1:33]
-
     success_packet = struct.pack('<HBBIBI',
-        0x03,
+        LOGON_SUCCESS,
         0,
         0,
         0,
