@@ -128,10 +128,21 @@ async def handle_login_client(reader, writer):
                     b'\x22'*16
                 )
 
+                # Debug incoming packet
+                username_len = data[33]
+                username = data[34:34+username_len].decode('ascii')
+                logging.info(f"Auth attempt from: {username}")
+                
+                # Verify client version (0368 = 3.3.5a)
+                client_build = data[9:13].decode('ascii')
+                logging.info(f"Client build: {client_build}")
+
+                # Force immediate send
                 writer.transport.set_write_buffer_limits(high=0)
                 writer.write(response)
                 debug_logging(response)
                 await writer.drain()
+                logging.info("Sent LOGON_PROOF response")
 
                 proof_data = await reader.read(75)
                 if not proof_data:
@@ -151,6 +162,7 @@ async def handle_login_client(reader, writer):
                 writer.write(success_packet)
                 debug_logging(success_packet)
                 await writer.drain()
+                logging.info("Sent LOGON_SUCCESS with redirect")
                 logging.info(f" Logon Successful")
 
             elif opcode == C_REALM_LIST:

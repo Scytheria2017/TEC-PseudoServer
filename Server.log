@@ -5,12 +5,9 @@
   --------------------------------------
   ======================================
  
-  Launched TEC client (PID: 11504)
- Login server running on 0.0.0.0:3724
- World server running on 0.0.0.0:8085
-  Login client connected: ('127.0.0.1', 55141)
- 
-  DEBUG: b'\x00\x08%\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x07ETERNAL'
-  Login client connected: ('127.0.0.1', 55154)
+  Launched TEC client (PID: 8604)
+  Login server running on 0.0.0.0:3724
+  World server running on 0.0.0.0:8085
+  Login client connected: ('127.0.0.1', 55320)
  
   DEBUG: b'\x00\x08%\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x07ETERNAL'
