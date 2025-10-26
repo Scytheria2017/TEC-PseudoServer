@@ -115,6 +115,13 @@ async def handle_login_client(reader, writer):
                 break
             debug_logging(data)
 
+            # Debug incoming packet
+            username_len = data[33]
+            username = data[34:34+username_len].decode('ascii')
+            logging.info(f"Auth attempt from: {username}")
+            client_build = data[9:13].decode('ascii')
+            logging.info(f"Client build: {client_build}")
+
             opcode = struct.unpack('<H', data[:2])[0]
     
             if opcode == LOGON_CHALLENGE:
@@ -128,16 +135,7 @@ async def handle_login_client(reader, writer):
                     b'\x22'*16
                 )
 
-                # Debug incoming packet
-                username_len = data[33]
-                username = data[34:34+username_len].decode('ascii')
-                logging.info(f"Auth attempt from: {username}")
-                
-                # Verify client version (0368 = 3.3.5a)
-                client_build = data[9:13].decode('ascii')
-                logging.info(f"Client build: {client_build}")
-
-                # Force immediate send
+                # Force immediate packet send (Line 172 added)
                 writer.transport.set_write_buffer_limits(high=0)
                 writer.write(response)
                 debug_logging(response)
@@ -147,6 +145,7 @@ async def handle_login_client(reader, writer):
                 proof_data = await reader.read(75)
                 if not proof_data:
                     break
+                logging.info(f"Received proof: {proof_data.hex()}")  # Line 182 added
                 debug_logging(proof_data)
 
                 success_packet = struct.pack('<HBBIBI',
