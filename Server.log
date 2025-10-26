@@ -1,10 +1,10 @@
-2025-10-26 13:49:44,848 - INFO - ======================================
-2025-10-26 13:49:44,848 - INFO - The Eternal Crusade Pseudo-Server v1.0
-2025-10-26 13:49:44,848 - INFO - ======================================
-2025-10-26 13:49:44,849 - DEBUG - Using proactor: IocpProactor
-2025-10-26 13:49:44,852 - INFO - Launched TEC client (PID: 15212)
-2025-10-26 13:49:44,853 - INFO - Login server running on 0.0.0.0:3724
-2025-10-26 13:49:44,853 - INFO - World server running on 0.0.0.0:8085
-2025-10-26 13:49:53,520 - INFO - Login client connected: ('127.0.0.1', 58112)
-2025-10-26 13:49:53,608 - INFO - Received data: 00082500576f57000303053430363878006e69570053556e65e00100007f00000107455445524e414c
-2025-10-26 13:49:53,608 - INFO - Auth attempt from: ETERNAL
+2025-10-26 17:03:00,025 - INFO - ======================================
+2025-10-26 17:03:00,025 - INFO - The Eternal Crusade Pseudo-Server v1.0
+2025-10-26 17:03:00,025 - INFO - ======================================
+2025-10-26 17:03:00,026 - DEBUG - Using proactor: IocpProactor
+2025-10-26 17:03:00,030 - INFO - Launched TEC client (PID: 10092)
+2025-10-26 17:03:00,031 - INFO - Login server running on 0.0.0.0:3724
+2025-10-26 17:03:00,031 - INFO - World server running on 0.0.0.0:8085
+2025-10-26 17:03:05,057 - INFO - Login client connected: ('127.0.0.1', 60173)
+2025-10-26 17:03:05,157 - DEBUG - Received data: 00082500576f57000303053430363878006e69570053556e65e00100007f00000107455445524e414c
+2025-10-26 17:03:12,062 - INFO - Client disconnected
