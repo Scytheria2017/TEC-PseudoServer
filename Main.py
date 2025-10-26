@@ -53,6 +53,7 @@ def debug_logging(text):
 
 LOGON_CHALLENGE =               0x00
 LOGON_PROOF =                   0x01
+RECONNECT_PROOF =               0x02
 LOGON_SUCCESS =                 0x03
 
 
@@ -61,6 +62,7 @@ LOGON_SUCCESS =                 0x03
 # --------------------
     
 C_REALM_LIST =                  0x01
+C_CHAR_ENUM =                   0x037
 C_PLAYER_LOGIN =                0x003D
 
 S_REALM_LIST =                  0x10
@@ -126,6 +128,7 @@ async def handle_login_client(reader, writer):
                     b'\x22'*16
                 )
 
+                writer.transport.set_write_buffer_limits(high=0)
                 writer.write(response)
                 debug_logging(response)
                 await writer.drain()
@@ -144,6 +147,7 @@ async def handle_login_client(reader, writer):
                     0x00000000
                 ) + b'\x00' + b'127.0.0.1:8085\x00'
 
+                writer.transport.set_write_buffer_limits(high=0)
                 writer.write(success_packet)
                 debug_logging(success_packet)
                 await writer.drain()
@@ -166,6 +170,7 @@ async def handle_login_client(reader, writer):
 
                 writer.write(realm_packet)
                 debug_logging(success_packet)
+                writer.transport.set_write_buffer_limits(high=0)
                 await writer.drain()
                 logging.info(f" Realm established")
 
@@ -207,6 +212,7 @@ async def handle_world_client(reader, writer):
 
                 writer.write(char_packet)
                 debug_logging(char_packet)
+                writer.transport.set_write_buffer_limits(high=0)
                 await writer.drain()
                 logging.info(f" Characters loaded")
 
@@ -220,6 +226,7 @@ async def handle_world_client(reader, writer):
     logging.info(f" Client disconnected: {client_addr}")
     writer.close()
   
+asyncio.streams._DEFAULT_LIMIT = 1024 * 1024
 
 async def run_server():
     login_server = await asyncio.start_server(
@@ -227,8 +234,8 @@ async def run_server():
     world_server = await asyncio.start_server(
         handle_world_client, '0.0.0.0', 8085)
 
-    logging.info(f"Login server running on 0.0.0.0:3724")
-    logging.info(f"World server running on 0.0.0.0:8085")
+    logging.info(f" Login server running on 0.0.0.0:3724")
+    logging.info(f" World server running on 0.0.0.0:8085")
    
     await asyncio.gather(
         login_server.serve_forever(),
