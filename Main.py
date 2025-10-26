@@ -144,25 +144,76 @@ async def handle_login_client(reader: asyncio.StreamReader, writer: asyncio.Stre
     try:
         client_addr = writer.get_extra_info('peername')
         logging.info(f"Login client connected: {client_addr}")
+        writer.transport.set_write_buffer_limits(high=0)  # Disable write buffering
 
         while True:
-            data = await reader.read(1024)
-            if not data:
-                logging.info("Client disconnected")
+            # Read initial packet data with timeout
+            try:
+                data = await asyncio.wait_for(reader.read(1024), timeout=5.0)
+                if not data:
+                    logging.info("Client disconnected")
+                    break
+            except asyncio.TimeoutError:
+                logging.warning("Timeout waiting for initial data")
                 break
             
-            logging.debug(f"Received data: {data.hex()}")
-            opcode = struct.unpack('<H', data[:2])[0]
+            logging.debug(f"Received initial data: {data.hex()}")
+            
+            # Parse opcode (big-endian for auth server)
+            if len(data) < 1:
+                logging.error("Packet too small for opcode")
+                continue
+                
+            opcode = data[0]  # First byte is opcode
+            logging.debug(f"Opcode: {opcode}")
 
             if opcode == LOGON_CHALLENGE:
-                # Parse client challenge
+                # Minimum size for LOGON_CHALLENGE header is 34 bytes
+                if len(data) < 34:
+                    logging.error("LOGON_CHALLENGE packet too small for header")
+                    continue
+                
+                # Parse fixed header fields
+                gamename = data[3:7].decode('ascii')
+                version = struct.unpack('>BBB', data[7:10])
+                build = struct.unpack('>H', data[10:12])[0]
                 username_len = data[33]
+                
+                # Calculate total expected packet size
+                # Header (34) + username + A (32)
+                expected_size = 34 + username_len + 32
+                
+                # If we don't have the full packet, read more data with timeout
+                if len(data) < expected_size:
+                    remaining_bytes = expected_size - len(data)
+                    logging.debug(f"Need {remaining_bytes} more bytes for complete packet")
+                    try:
+                        more_data = await asyncio.wait_for(reader.read(remaining_bytes), timeout=5.0)
+                        if not more_data:
+                            logging.error("Client disconnected while reading remaining data")
+                            break
+                        data += more_data
+                        logging.debug(f"Complete packet: {data.hex()}")
+                    except asyncio.TimeoutError:
+                        logging.warning("Timeout waiting for remaining packet data")
+                        break
+                
+                # Verify we have complete packet
+                if len(data) < expected_size:
+                    logging.error(f"Incomplete packet (got {len(data)}, expected {expected_size})")
+                    continue
+                
+                # Extract username and A value
                 username = data[34:34+username_len].decode('ascii', 'ignore').upper()
-                logging.info(f"Auth attempt from: {username}")
+                a_start = 34 + username_len
+                A = data[a_start:a_start+32]
+                
+                logging.info(f"Auth attempt from: {username} (Build: {build}, Game: {gamename})")
+                logging.debug(f"Client A value: {A.hex()}")
                 
                 if username != ACCOUNT["username"]:
                     logging.warning(f"Unknown account: {username}")
-                    response = struct.pack('<HBB', LOGON_PROOF, 4, 0)  # Unknown account error
+                    response = struct.pack('>BB', LOGON_PROOF, 4)  # Unknown account error
                     writer.write(response)
                     await writer.drain()
                     continue
@@ -177,54 +228,68 @@ async def handle_login_client(reader: asyncio.StreamReader, writer: asyncio.Stre
                 sessions[session_id] = {
                     "username": username,
                     "salt": salt,
-                    "B": verifier,  # Using verifier as B for simplicity
+                    "B": verifier,
                     "K": session_key,
-                    "A": data[35:35+32]  # Client's A value
+                    "A": A
                 }
                 
-                # Send challenge response
-                response = struct.pack('<HBB32s32s16s',
+                # Build and send challenge response
+                # Structure: [opcode:1][error:1][B:32][g_len:1][g:1][N_len:1][N:32][salt:32][unk:16]
+                response = struct.pack('>BB32sB1sB32s32s16s',
                     LOGON_PROOF,
-                    0,  # Error code
-                    32,  # Salt size
-                    salt,
-                    verifier,
+                    0,            # Error code
+                    verifier,     # B
+                    1,            # g_len
+                    g.to_bytes(1, 'big'),  # g
+                    32,           # N_len
+                    int_to_bytes(N, 32),  # N
+                    salt,         # salt
                     session_key[:16]  # Session key (first half)
                 )
+                
                 writer.write(response)
                 await writer.drain()
-                logging.debug("Sent LOGON_PROOF response")
+                logging.debug(f"Sent LOGON_PROOF response: {response.hex()}")
 
-                # Wait for client proof
-                proof_data = await reader.read(75)
-                if not proof_data:
-                    logging.warning("No proof data received")
-                    break
-                
-                logging.debug(f"Received proof: {proof_data.hex()}")
-                client_proof = proof_data[16:16+20]
-                A = sessions[session_id]["A"]
-                
-                if not calculate_proofs(sessions[session_id], A, client_proof):
-                    logging.warning("Invalid client proof")
-                    response = struct.pack('<HBB', LOGON_PROOF, 3, 0)  # Invalid proof error
-                    writer.write(response)
+                # Wait for client proof with timeout
+                try:
+                    proof_data = await asyncio.wait_for(reader.read(75), timeout=5.0)
+                    if not proof_data:
+                        logging.warning("No proof data received")
+                        break
+                    
+                    logging.debug(f"Received proof: {proof_data.hex()}")
+                    
+                    if len(proof_data) < 36:
+                        logging.error("Proof packet too small")
+                        continue
+                        
+                    client_proof = proof_data[16:36]  # M1 is 20 bytes
+                    
+                    if not calculate_proofs(sessions[session_id], A, client_proof):
+                        logging.warning("Invalid client proof")
+                        response = struct.pack('>BB', LOGON_PROOF, 3)  # Invalid proof error
+                        writer.write(response)
+                        await writer.drain()
+                        continue
+
+                    # Send success with redirect
+                    success_packet = struct.pack('>BBIBI', 
+                        LOGON_SUCCESS,
+                        0x00,  # Error code
+                        0x00,  # Survey ID
+                        0x00000000,  # Login flags
+                        0x00,  # Unused
+                        0x00000000  # Unused
+                    ) + b'\x00' + b'127.0.0.1:8085\x00'
+                    
+                    writer.write(success_packet)
                     await writer.drain()
-                    continue
+                    logging.info("Logon successful")
 
-                # Send success with redirect
-                success_packet = struct.pack('<HBBIBI', 
-                    LOGON_SUCCESS,
-                    0x00,  # Error code
-                    0x00,  # Survey ID
-                    0x00000000,  # Login flags
-                    0x00,  # Unused
-                    0x00000000  # Unused
-                ) + b'\x00' + b'127.0.0.1:8085\x00'
-                
-                writer.write(success_packet)
-                await writer.drain()
-                logging.info("Logon successful")
+                except asyncio.TimeoutError:
+                    logging.warning("Timeout waiting for client proof")
+                    break
 
             elif opcode == C_REALM_LIST:
                 logging.info("Sending realm list")
@@ -245,13 +310,14 @@ async def handle_login_client(reader: asyncio.StreamReader, writer: asyncio.Stre
                     1   # Realm ID
                 ) + realm_name + realm_address
                 
-                # Update size field
+                # Update size field (excluding opcode)
                 size = len(realm_packet) - 3  # Exclude opcode and size fields
                 realm_packet = realm_packet[:1] + struct.pack('>H', size) + realm_packet[3:]
                 
                 writer.write(realm_packet)
                 await writer.drain()
                 logging.info("Realm list sent")
+                
     except Exception as e:
         logging.error(f"ERROR - handling login client: {str(e)}", exc_info=DEBUG)
     finally:

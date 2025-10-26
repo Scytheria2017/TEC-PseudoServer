@@ -1,10 +1,17 @@
-2025-10-26 17:03:00,025 - INFO - ======================================
-2025-10-26 17:03:00,025 - INFO - The Eternal Crusade Pseudo-Server v1.0
-2025-10-26 17:03:00,025 - INFO - ======================================
-2025-10-26 17:03:00,026 - DEBUG - Using proactor: IocpProactor
-2025-10-26 17:03:00,030 - INFO - Launched TEC client (PID: 10092)
-2025-10-26 17:03:00,031 - INFO - Login server running on 0.0.0.0:3724
-2025-10-26 17:03:00,031 - INFO - World server running on 0.0.0.0:8085
-2025-10-26 17:03:05,057 - INFO - Login client connected: ('127.0.0.1', 60173)
-2025-10-26 17:03:05,157 - DEBUG - Received data: 00082500576f57000303053430363878006e69570053556e65e00100007f00000107455445524e414c
-2025-10-26 17:03:12,062 - INFO - Client disconnected
+2025-10-27 04:16:13,147 - INFO - ======================================
+2025-10-27 04:16:13,147 - INFO - The Eternal Crusade Pseudo-Server v1.0
+2025-10-27 04:16:13,147 - INFO - ======================================
+2025-10-27 04:16:13,148 - DEBUG - Using proactor: IocpProactor
+2025-10-27 04:16:13,151 - INFO - Launched TEC client (PID: 11724)
+2025-10-27 04:16:13,153 - INFO - Login server running on 0.0.0.0:3724
+2025-10-27 04:16:13,153 - INFO - World server running on 0.0.0.0:8085
+2025-10-27 04:16:19,430 - INFO - Login client connected: ('127.0.0.1', 51254)
+2025-10-27 04:16:19,529 - DEBUG - Received initial data: 00082500576f57000303053430363878006e69570053556e65e00100007f00000107455445524e414c
+2025-10-27 04:16:19,530 - DEBUG - Opcode: 0
+2025-10-27 04:16:19,530 - DEBUG - Need 32 more bytes for complete packet
+2025-10-27 04:16:24,540 - WARNING - Timeout waiting for remaining packet data
+2025-10-27 04:16:29,263 - INFO - Login client connected: ('127.0.0.1', 51258)
+2025-10-27 04:16:29,285 - DEBUG - Received initial data: 00082500576f57000303053430363878006e69570053556e65e00100007f00000107455445524e414c
+2025-10-27 04:16:29,286 - DEBUG - Opcode: 0
+2025-10-27 04:16:29,286 - DEBUG - Need 32 more bytes for complete packet
+2025-10-27 04:16:34,291 - WARNING - Timeout waiting for remaining packet data
