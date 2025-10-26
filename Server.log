@@ -1,15 +1,10 @@
- 
-  ======================================
-  --------------------------------------
-  The Eternal Crusade Pseudo-Server v1.0
-  --------------------------------------
-  ======================================
- 
-  Launched TEC client (PID: 16808)
-  Login server running on 0.0.0.0:3724
-  World server running on 0.0.0.0:8085
-  Login client connected: ('127.0.0.1', 57632)
- 
-  DEBUG: b'\x00\x08%\x00WoW\x00\x03\x03\x054068x\x00niW\x00SUne\xe0\x01\x00\x00\x7f\x00\x00\x01\x07ETERNAL'
- Auth attempt from: ETERNAL
- Client build: 40
+2025-10-26 13:49:44,848 - INFO - ======================================
+2025-10-26 13:49:44,848 - INFO - The Eternal Crusade Pseudo-Server v1.0
+2025-10-26 13:49:44,848 - INFO - ======================================
+2025-10-26 13:49:44,849 - DEBUG - Using proactor: IocpProactor
+2025-10-26 13:49:44,852 - INFO - Launched TEC client (PID: 15212)
+2025-10-26 13:49:44,853 - INFO - Login server running on 0.0.0.0:3724
+2025-10-26 13:49:44,853 - INFO - World server running on 0.0.0.0:8085
+2025-10-26 13:49:53,520 - INFO - Login client connected: ('127.0.0.1', 58112)
+2025-10-26 13:49:53,608 - INFO - Received data: 00082500576f57000303053430363878006e69570053556e65e00100007f00000107455445524e414c
+2025-10-26 13:49:53,608 - INFO - Auth attempt from: ETERNAL
